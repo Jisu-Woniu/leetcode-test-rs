@@ -3,6 +3,7 @@ use std::ops::{Deref, DerefMut};
 use crate::ListNode;
 
 pub(super) type List = Option<Box<ListNode>>;
+
 struct ListWrapper(List);
 
 impl FromIterator<i32> for ListWrapper {
