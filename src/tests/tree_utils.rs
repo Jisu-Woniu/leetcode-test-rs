@@ -58,11 +58,29 @@ pub(super) fn unwrap_tree<T: IntoIterator<Item = Option<i32>>>(iter: T) -> Tree 
     TreeWrapper::from_iter(iter).into()
 }
 
+macro_rules! tree {
+    (@cons [] [$($ele:expr),* $(,)?]) => {
+        // `.into()` allows us to construct either `TreeWrapper` or `Tree`
+        $crate::tests::tree_utils::TreeWrapper::from_iter(vec![$($ele),*]).into()
+    };
+
+    (@cons [null $(, $($tail:tt)*)?] [$($ele:expr),* $(,)?]) => {
+        tree!(@cons [$($($tail)*)?] [$($ele,)* None])
+    };
+    (@cons [$head:expr $(, $($tail:tt)*)?] [$($ele:expr),* $(,)?]) => {
+        tree!(@cons [$($($tail)*)?] [$($ele,)* Some($head)])
+    };
+    ($($raw_ele:tt)*) => {
+        tree!(@cons [$($raw_ele)*] [])
+    };
+}
+
+#[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_tree_utils() {
-        use super::*;
         assert_eq!(
             TreeWrapper::from_iter(vec![Some(1), None, Some(2), Some(3)]),
             TreeWrapper(new_tree(
@@ -90,6 +108,25 @@ mod tests {
                 new_tree(4, new_tree(3, new_tree(-1, None, None), None), None),
                 new_tree(7, new_tree(2, new_tree(9, None, None), None), None)
             ))
+        );
+    }
+
+    #[test]
+    fn test_tree_macro() {
+        assert_eq!(
+            TreeWrapper::from_iter(vec![
+                Some(5),
+                Some(4),
+                Some(7),
+                Some(3),
+                None,
+                Some(2),
+                None,
+                Some(-1),
+                None,
+                Some(9)
+            ]),
+            tree![5, 4, 7, 3, null, 2, null, -1, null, 9]
         );
     }
 }

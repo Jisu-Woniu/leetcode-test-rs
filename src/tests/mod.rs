@@ -21,6 +21,19 @@ macro_rules! test_eq {
     };
 }
 
+#[allow(unused_macros)]
+macro_rules! vec_string {
+    () => (
+        Vec::<String>::new()
+    );
+    ($s:literal; $n:expr) => (
+        vec![String::from($s); $n]
+    );
+    ($($s:literal), * $(, )?) => {
+        vec![$(String::from($s)), *]
+    };
+}
+
 // Multiple cases in one invocation.
 test_eq! {
     tests:
