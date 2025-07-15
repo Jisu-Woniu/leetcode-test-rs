@@ -7,6 +7,15 @@ mod tests;
 
 pub struct Solution;
 
+#[cfg(test)]
+impl Solution {
+    /// Dummy function that always return `input` as is.
+    #[allow(dead_code)]
+    pub(crate) fn dummy_fn<T>(input: T) -> T {
+        input
+    }
+}
+
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct ListNode {
     pub val: i32,

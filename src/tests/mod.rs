@@ -34,6 +34,34 @@ macro_rules! vec_string {
     };
 }
 
+#[allow(unused_macros)]
+macro_rules! vec_option {
+    // `@item`: process next item (`null` or an `expr`) and append it to the array.
+    // Always process `null` before other `expr`s, prevent `use std::ptr::null;` interference.
+    // Consume exactly one comma after the item.
+    (@item [$($items:expr),*] null $(, $($rem:tt)*)?) => {
+        vec_option!(@item [$($items,)* None] $($($rem)*)?)
+    };
+    (@item [$($items:expr),*] $e:expr $(, $($rem:tt)*)?) => {
+        vec_option!(@item [$($items,)* Some($e)] $($($rem)*)?)
+    };
+    // No more items, call `vec!` on the result directly.
+    (@item [$($items:expr),*]) => {
+        vec![$($items),*]
+    };
+    // Repeat expression handling.
+    (null; $n:expr) => {
+        vec![None; $n]
+    };
+    ($e:expr; $n:expr) => {
+        vec![Some($e); $n]
+    };
+    // Forward to `@item` call.
+    ($($tt:tt)*) => {
+        vec_option!(@item [] $($tt)*)
+    }
+}
+
 // Multiple cases in one invocation.
 test_eq! {
     tests:
