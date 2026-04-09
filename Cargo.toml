@@ -1,10 +1,10 @@
 [package]
 name = "leetcode-test"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.85"
+edition = "2024"
+rust-version = "1.88"
 
 [dependencies]
 itertools = "0.14.0"
-rand = "0.9.1"
-regex = "1.11.1"
+rand = "0.10.0"
+regex = "1.12.3"
