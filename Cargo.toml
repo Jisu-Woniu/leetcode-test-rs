@@ -6,5 +6,5 @@ rust-version = "1.88"
 
 [dependencies]
 itertools = "0.14.0"
-rand = "0.10.0"
+rand = "0.8.6"
 regex = "1.12.3"
