@@ -1,7 +1,7 @@
 #![allow(unused_macros)]
 
 macro_rules! test_eq {
-    ($(#[$group_meta: meta])* $group_name:ident : $($(#[$fn_meta: meta])* $i:ident => $actual:expr, $expect:expr);+ $(;)?) => {
+    ($(#[$group_meta: meta])* $group_name:ident : $($(#[$fn_meta: meta])* $fn_name:ident => $actual:expr, $expect:expr);+ $(;)?) => {
         #[cfg(test)]
         $(#[$group_meta])*
         mod $group_name {
@@ -10,7 +10,7 @@ macro_rules! test_eq {
             $(
                 #[test]
                 $(#[$fn_meta])*
-                fn $i() {
+                fn $fn_name() {
                     assert_eq!($actual, $expect);
                 }
             )+
@@ -63,11 +63,36 @@ macro_rules! vec_nested {
         vec![]
     };
     // Recursive case: handle multiple nested vectors
-    ($([$($inner:tt)*]),* $(,)?) => {
-        vec![$(vec_nested![$($inner)*],)*]
+    ($([$($inner:tt)*]),+ $(,)?) => {
+        vec![$(vec_nested![$($inner)*]),+]
     };
-    // Base case: handle a single vector of elements
+    ([$($inner:tt)*]; $n:expr) => {
+        vec![vec_nested![$($inner)*]; $n]
+    };
+    // Base case: forward to `vec!` call.
     ($($elem:tt)*) => {
         vec![$($elem)*]
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{convert::Infallible, fmt::Debug};
+
+    /// Helper function for adding type annotations.
+    fn assert_equal<T: PartialEq + Debug>(a: T, b: T) {
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn test_vec_nested() {
+        assert_equal::<Vec<Infallible>>(vec![], vec_nested![]);
+        assert_eq!(vec![1, 2], vec_nested![1, 2]);
+        assert_eq!(vec![1, 2], vec_nested![1, 2,]);
+        assert_eq!(vec![vec![1, 2]], vec_nested![[1, 2]]);
+        assert_eq!(vec![vec![1, 2], vec![3, 4]], vec_nested![[1, 2], [3, 4]]);
+        assert_eq!(vec![vec![1, 2], vec![3, 4]], vec_nested![[1, 2], [3, 4],]);
+        assert_eq!(vec![vec![vec![1]]], vec_nested![[[1]]]);
+        assert_eq!(vec![vec![1]; 5], vec_nested![[1]; 5]);
+    }
 }
