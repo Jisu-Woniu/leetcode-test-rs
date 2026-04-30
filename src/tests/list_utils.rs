@@ -59,7 +59,7 @@ impl From<ListWrapper> for List {
 }
 
 #[allow(dead_code)]
-pub(super) fn unwrap_list<I>(iter: I) -> List
+pub(super) fn linked_list<I>(iter: I) -> List
 where
     I: IntoIterator<Item = i32>,
 {
